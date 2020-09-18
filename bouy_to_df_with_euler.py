@@ -13,7 +13,7 @@ import pandas as pd
 
 t0 = time.time()
 #initialize a list with header labels
-lst = [b't,Ax,Ay,Az,Bx,By,Bz,h\n']
+lst = [b't,Ax,Ay,Az,Wx,Wy,Wz,Bx,By,Bz,phi,theta,psi,Altitude\n']
 
 #create the serial port object
 port = serial.Serial('COM11', 115200, timeout=0.5)
@@ -32,19 +32,21 @@ while (i<1024):
         lst.append(b',')#csv
         lst.append(value)#append the serial print from the arduino, this ends with a println
 
-
+        print(i)
         time.sleep(0.01)
         i+= 1#used for development so i dont have infnt data
 
+port.close()
 
 
-with open('data/sampleData.csv', 'wb') as f:#obviously cut and paste from the internet
+
+with open('data/sampleDataEuler.csv', 'wb') as f:#obviously cut and paste from the internet
     for line in lst:
         f.write(line)#write each line into the csv, it dectects , and \n
 
 
 # create a dataframe using the file we just made
-df = pd.read_csv('data/sampleData.csv',index_col=0,error_bad_lines=False)
+df = pd.read_csv('data/sampleDataEuler.csv',index_col=0,error_bad_lines=False)
 
 #take a peek into the dataframe
 print(df.head())
@@ -60,7 +62,6 @@ print(df.head())
 
 
 # the best option by far
-df.plot(subplots=True,figsize=(11,17),layout=(3,4))
+#df.plot(subplots=True,figsize=(11,17),layout=(3,4))
 
 
-port.close()

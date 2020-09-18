@@ -8,6 +8,8 @@ Created on Mon Aug 31 17:58:34 2020
 import pandas as pd
 import numpy as np
 from scipy import fftpack
+from scipy.integrate import cumtrapz
+
 
 pi = np.pi
 
@@ -56,9 +58,6 @@ def align_motion_with_mag_field(df):
     return rotated_df
 
 
-rotated_df = align_motion_with_mag_field(df)
-
-dt = rotated_df.index[1]-rotated_df.index[0]
 
 
 def smooth(x, window_len=50, window='hanning'):
@@ -116,27 +115,41 @@ def smooth(x, window_len=50, window='hanning'):
     return y[window_len-1:-window_len+1]
 
 
+
+df['Bx'] = df['Bx'].rolling(100).mean()
+df['By'] = df['By'].rolling(100).mean()
+df['Bz'] = df['Bz'].rolling(100).mean()
+
+df['Bx'] = smooth(df['Bx'].values, window_len=700)
+df['By'] = smooth(df['By'].values, window_len=700)
+df['Bz'] = smooth(df['Bz'].values, window_len=700)
+
+
+df.dropna(inplace=True)
+
+df.plot(subplots=True, figsize=(15, 15), layout=(3, 5), sharey=False)
+
+
+
+rotated_df = align_motion_with_mag_field(df)
+
+dt = rotated_df.index[1]-rotated_df.index[0]
+
+
 rotated_df['Ax'] = smooth(rotated_df['Ax'].values)
 rotated_df['Ay'] = smooth(rotated_df['Ay'].values)
 rotated_df['Az'] = smooth(rotated_df['Az'].values)
 
 
-def numerical_integrate(x, dt):
-    x = list(x)
-    F = []
-    for i in range(len(x)-1):
-        # -1 is necessary so that the index doesnt go over
-        F.append(((x[i+1]-x[i])/2)*dt)
-    return F
 
 
-Vx = numerical_integrate(rotated_df['Ax'], dt)
-Vy = numerical_integrate(rotated_df['Ay'], dt)
-Vz = numerical_integrate(rotated_df['Az'], dt)
+Vx = cumtrapz(rotated_df['Ax'], dx=dt)
+Vy = cumtrapz(rotated_df['Ay'], dx=dt)
+Vz = cumtrapz(rotated_df['Az'], dx=dt)
 
-x = numerical_integrate(Vx, dt)
-y = numerical_integrate(Vy, dt)
-z = numerical_integrate(Vz, dt)
+x = cumtrapz(Vx, dx=dt)
+y = cumtrapz(Vy, dx=dt)
+z = cumtrapz(Vz, dx=dt)
 
 integrals = {
     't': df.index,
@@ -155,7 +168,7 @@ motion_df = pd.DataFrame.from_dict(integrals, orient='index')
 
 motion_df = motion_df.transpose()
 
-motion_df.plot(x='t', subplots=True, figsize=(15, 15), layout=(3, 3))
+motion_df.plot(x='t', subplots=True, figsize=(15, 15), layout=(3, 3), sharey=False)
 
 
 A_xf = fftpack.fft(x)
