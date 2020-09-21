@@ -82,7 +82,6 @@ def madgwickUpdate(q, a, g, m, st=0.01, gain=0.041):
     return q
 
 
-
 class Madgwick:
 
     def __init__(self, acc=None, gyr=None, mag=None, **kwargs):
@@ -90,29 +89,25 @@ class Madgwick:
         self.gyr = gyr
         self.mag = mag
         self.frequency = kwargs.get('frequency', 100.0)
-        self.dt = kwargs.get('dt', 1.0/self.frequency)
+        self.dt = kwargs.get('dt', 1.0 / self.frequency)
         self.q0 = kwargs.get('q0')
         if self.acc is not None and self.gyr is not None:
-            self.Q , self.earthAcc = self.compute()
-
+            self.Q, self.earthAcc = self.compute()
 
     def compute(self):
         N = len(self.acc)
         Q = []
         Q.append(Quaternion(np.array([1, 0, 0, 0])))
-        for i in range(1,N):
-            Q.append(madgwickUpdate(Q[i-1],self.acc[i],self.gyr[i],self.mag[i]))
+        for i in range(1, N):
+            Q.append(madgwickUpdate(
+                Q[i - 1], self.acc[i], self.gyr[i], self.mag[i]))
 
-        earthAcc = np.zeros((N,3))
+        earthAcc = np.zeros((N, 3))
 
-        for i in range(1,N):
+        for i in range(1, N):
             earthAcc[i] = Q[i].rotate_vector(acc[i])
 
         return Q, earthAcc
 
 
-
-M = Madgwick(acc=acc, gyr=gyr, mag = mag,q0=quat,dt=dt)
-
-
-
+M = Madgwick(acc=acc, gyr=gyr, mag=mag, q0=quat, dt=dt)
