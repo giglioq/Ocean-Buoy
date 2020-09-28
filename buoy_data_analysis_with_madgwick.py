@@ -111,3 +111,5 @@ class Madgwick:
 
 
 M = Madgwick(acc=acc, gyr=gyr, mag=mag, q0=quat, dt=dt)
+
+
