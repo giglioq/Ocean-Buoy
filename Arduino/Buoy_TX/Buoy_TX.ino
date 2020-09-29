@@ -3,8 +3,8 @@
 Demonstrates sending and receiving packets of different length.
 
 Radio    Arduino
-CE    -> 9
-CSN   -> 10 (Hardware SPI SS)
+CE    -> 7
+CSN   -> 8 (Hardware SPI SS)
 MOSI  -> 11 (Hardware SPI MOSI)
 MISO  -> 12 (Hardware SPI MISO)
 SCK   -> 13 (Hardware SPI SCK)
@@ -25,9 +25,21 @@ GND   -> GND
 /* Set the delay between fresh samples */
 uint16_t BNO055_SAMPLERATE_DELAY_MS = 100;
 
+#define TCAADDR 0x70
+
+/* select I2C channel using TCA9548A multiplexer */
+void tcaselect(uint8_t channel)
+{
+  Serial.print("I2C Channel: ");  Serial.println(channel);
+  Wire.beginTransmission(0x70);
+  Wire.write(1 << channel);
+  Wire.endTransmission();
+}
+
+
 // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
 //                                   id, address
-Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
+Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 
 
@@ -63,7 +75,11 @@ void setup()
     Serial.begin(115200);
 
     Serial.println("Orientation Sensor Test"); Serial.println("");
-
+  Wire.begin();
+  
+  //channel to open
+  tcaselect(1);
+  Serial.println("did we make it here");
   /* Initialise the sensor */
   if (!bno.begin())
   {
@@ -72,22 +88,24 @@ void setup()
     while (1);
   }
 
+  
 
 
-
-
+  
     if (!_radio.init(RADIO_ID, PIN_RADIO_CE, PIN_RADIO_CSN))
     {
         Serial.println("Cannot communicate with radio");
         while (1); // Wait here forever.
     }
+    
+    //_radio.printDetails();
 
 }
 
 void loop()
 {
     
-
+    tcaselect(1);
     // Send a fake GPS sentence once every 4 seconds.
     if (millis() - _lastSendTime > 3999)
     {
