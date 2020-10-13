@@ -78,7 +78,7 @@ void setup()
   Wire.begin();
   
   //channel to open
-  tcaselect(1);
+  tcaselect(0);
   Serial.println("did we make it here");
   /* Initialise the sensor */
   if (!bno.begin())
@@ -99,15 +99,16 @@ void setup()
     }
     
     //_radio.printDetails();
+    delay(5000);
 
 }
 
 void loop()
 {
-    
-    tcaselect(1);
-    // Send a fake GPS sentence once every 4 seconds.
-    if (millis() - _lastSendTime > 3999)
+    Serial.println("---");
+    tcaselect(0);
+    // Send a sentence once every 0.5 seconds.
+    if (millis() - _lastSendTime > 4999)
     {
         _lastSendTime = millis();
         uint8_t system, gyro, accel, mg = 0;
@@ -115,9 +116,10 @@ void loop()
         imu::Vector<3> acc =bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
         imu::Vector<3> gyr =bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
         imu::Vector<3> mag =bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-        Serial.println("--");
-
-        String msg = String(acc.x())+","+String(acc.y())+","+String(acc.z())+String(gyr.x())+","+String(gyr.y())+","+String(gyr.z())+String(mag.x())+","+String(mag.y())+","+String(mag.z());
+        
+        String movement = String(acc.x())+","+String(acc.y())+","+String(acc.z())+","+String(gyr.x())+","+String(gyr.y())+","+String(gyr.z())+","+String(mag.x())+","+String(mag.y())+","+String(mag.z());
+        String filler = "Some filler stuff";
+        String msg = movement + filler;
         sendSentence(msg, _sentenceId);
         _sentenceId++;
     }
@@ -125,7 +127,7 @@ void loop()
     
    
 
-    delay(1000);
+    delay(5000);
 }
 
 
@@ -172,7 +174,7 @@ bool sendPacket(RadioPacket packet)
 {
     Serial.print("  Sending Packet " + String(packet.PacketNumber) + " - ");
 
-    if (_radio.send(DESTINATION_RADIO_ID, &packet, sizeof(packet)))
+    if (_radio.send(DESTINATION_RADIO_ID, &packet, sizeof(packet), NRFLite::NO_ACK))
     {
         printPacket(packet);
         return true;

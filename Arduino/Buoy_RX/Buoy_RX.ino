@@ -72,7 +72,7 @@ void loop()
             addPacketToSentence(packet); // The sentence should now be complete.
             
             String sentence = String(_sentenceAsCharArray); // Convert the char array we were building into a string.
-            Serial.println("  Complete - " + sentence);
+            Serial.println("  Complete : " + sentence);
             Serial.println("  Sentence Length = " + String(sentence.length()));
         }
     }
