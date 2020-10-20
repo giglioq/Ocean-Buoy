@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from scipy import fftpack
 from scipy.integrate import cumtrapz
-
+import matplotlib.pyplot as plt
 from quaternion import Quaternion
 
 
@@ -99,6 +99,9 @@ def get_position(acc,dt):
     vx = cumtrapz(acc[:,0], dx=dt)
     vy = cumtrapz(acc[:,1], dx=dt)
     vz = cumtrapz(acc[:,2], dx=dt)
+    plt.plot(vx)
+    plt.plot(vy)
+    plt.plot(vz)
     x = cumtrapz(vx, dx=dt)
     y = cumtrapz(vy, dx=dt)
     z = cumtrapz(vz, dx=dt)
@@ -150,12 +153,16 @@ def frequency_analysis(position, dt=0.01):
     Q['yx'] = 0.0
 
     a1 = Q.xz / (np.sqrt((C.zz + C.yy) * C.zz))
+    print("a1: "+str(a1))
     # possibly not negative
     b1 = -Q.yz / ((np.sqrt((C.zz + C.yy) * C.zz)))
+    print("b1: "+str(b1))
     a2 = (C.xx - C.yy) / (C.xx + C.yy)
+    print("a2: "+str(a2))
     b2 = - 2*C.xy / (C.xx + C.yy)
+    print("b2: "+str(b2))
 
-    theta = np.linspace(0, 2*np.pi, num=6)
+    theta = np.linspace(0, 2*np.pi, num=360)
 
     D = pd.DataFrame(index=theta)
 
