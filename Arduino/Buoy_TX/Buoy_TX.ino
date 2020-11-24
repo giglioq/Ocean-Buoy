@@ -108,7 +108,7 @@ void loop()
     Serial.println("---");
     tcaselect(0);
     // Send a sentence once every 0.5 seconds.
-    if (millis() - _lastSendTime > 4999)
+    if (millis() - _lastSendTime > 299)
     {
         _lastSendTime = millis();
         uint8_t system, gyro, accel, mg = 0;
@@ -116,10 +116,21 @@ void loop()
         imu::Vector<3> acc =bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
         imu::Vector<3> gyr =bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
         imu::Vector<3> mag =bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-        
+        imu::Quaternion quat = bno.getQuat();
+        /* Display the quat data */
+//        Serial.print("qW: ");
+//        Serial.print(quat.w(), 4);
+//        Serial.print(" qX: ");
+//        Serial.print(quat.y(), 4);
+//        Serial.print(" qY: ");
+//        Serial.print(quat.x(), 4);
+//        Serial.print(" qZ: ");
+//        Serial.print(quat.z(),4);
+//        Serial.println("");
+        String quats = String(quat.w())+","+String(quat.x())+","+String(quat.y())+","+String(quat.z());
         String movement = String(acc.x())+","+String(acc.y())+","+String(acc.z())+","+String(gyr.x())+","+String(gyr.y())+","+String(gyr.z())+","+String(mag.x())+","+String(mag.y())+","+String(mag.z());
         String filler = "Some filler stuff";
-        String msg = movement + filler;
+        String msg = movement+","+quats;
         sendSentence(msg, _sentenceId);
         _sentenceId++;
     }
@@ -127,7 +138,7 @@ void loop()
     
    
 
-    delay(5000);
+    delay(300);
 }
 
 

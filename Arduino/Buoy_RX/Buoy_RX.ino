@@ -60,28 +60,29 @@ void loop()
 
         if (packet.PacketNumber == 0)
         {
-            Serial.println("Receiving Sentence " + String(packet.SentenceId));
+            //Serial.println("Receiving Sentence " + String(packet.SentenceId));
             addPacketToSentence(packet);
         }
         else if (packet.PacketNumber == 1)
         {
             addPacketToSentence(packet);
+
         }
         else if (packet.PacketNumber == 2)
         {
             addPacketToSentence(packet); // The sentence should now be complete.
             
             String sentence = String(_sentenceAsCharArray); // Convert the char array we were building into a string.
-            Serial.println("  Complete : " + sentence);
-            Serial.println("  Sentence Length = " + String(sentence.length()));
+            Serial.println(sentence);
+            //Serial.println("  Sentence Length = " + String(sentence.length()));
         }
     }
 }
 
 void addPacketToSentence(RadioPacket packet)
 {
-    Serial.print("  Packet " + String(packet.PacketNumber) + " - ");
-    printPacket(packet);
+    //Serial.print("  Packet " + String(packet.PacketNumber) + " - ");
+    //printPacket(packet);
     
     // Determine location to place data within the sentence char array.
     // If it is the first packet, i.e. PacketNumber = 0, then the location = 0.

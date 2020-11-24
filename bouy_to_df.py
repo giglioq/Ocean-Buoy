@@ -11,12 +11,12 @@ import pandas as pd
 
 
 
-t0 = time.time()
+t0 = time.time() #time in seconds since epoch
 #initialize a list with header labels
-lst = [b't,Ax,Ay,Az,Bx,By,Bz,h\n']
+lst = [b't,Ax,Ay,Az,wx,wy,wz,Bx,By,Bz,qw,qx,qy,qz\n']
 
 #create the serial port object
-port = serial.Serial('COM11', 115200, timeout=0.5)
+port = serial.Serial('COM4', 115200, timeout=0.5)
 
 i=0
 
@@ -28,14 +28,16 @@ while (i<1024):
         #t = time.localtime()#get the currernt time (uses my laptop which is currently in Central Time)
         #current_time = time.strftime("%H:%M:%S", t)#format
         #lst.append(current_time.encode())#append at start of new line (used for index)
-        lst.append(bytes(str((time.time()-t0)*1000),'utf-8'))
+        lst.append(bytes(str((time.time()-t0)),'utf-8')) # time since start in seconds currently ~.3seconds
         lst.append(b',')#csv
         lst.append(value)#append the serial print from the arduino, this ends with a println
 
 
         time.sleep(0.01)
         i+= 1#used for development so i dont have infnt data
+        print("line: "+str(i)+": "+str(value))
 
+port.close()
 
 
 with open('data/sampleData.csv', 'wb') as f:#obviously cut and paste from the internet
@@ -63,4 +65,3 @@ print(df.head())
 df.plot(subplots=True,figsize=(11,17),layout=(3,4))
 
 
-port.close()

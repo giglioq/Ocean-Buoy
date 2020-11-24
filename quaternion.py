@@ -8,23 +8,30 @@ class Quaternion:
     def __init__(self, w, x=None, y=None, z=None):
         q = []
         if isinstance(w, Quaternion):
-            self.q = w.q
             q = w.q
-
         elif isinstance(w, np.ndarray):
+            print("test array")
             if len(w) == 4:
                 q = w
             elif len(w) == 3:
                 q = np.append(0, w)
-            norm = np.linalg.norm(q)
-            q = q / norm
-            self.q = q
+
         elif x is not None and y is not None and z is not None:
-            self.q = [w, x, y, z]
-        self.w = q[0]
-        self.x = q[1]
-        self.y = q[2]
-        self.z = q[3]
+            q = [w, x, y, z]
+
+        elif isinstance(w,list):
+            q=w
+
+        self.q=q
+        self.normalize()
+
+    def normalize(self):
+        norm = np.linalg.norm(self.q)
+        self.q = self.q/norm
+        self.w = self.q[0]
+        self.x = self.q[1]
+        self.y = self.q[2]
+        self.z = self.q[3]
 
     def to_array(self):
         return self.q
@@ -92,12 +99,13 @@ class Quaternion:
 
     def as_rotation_matrix(self):
         R = np.array([
-            [1 - 2 * (q.y**2 + q.z**2), 2 * (q.x * q.y - q.w * q.z),
-             2 * (q.w * q.y + q.x * q.z)],
-            [2 * (q.x * q.y + q.w * q.z), 1 - 2 *
-             (q.x**2 + q.z**2), 2 * (q.y * q.z - q.w * q.x)],
-            [2 * (q.x * q.z - q.w * q.y), 2 *
-             (q.w * q.x + q.y * q.z), 1 - 2 * (q.x**2 + q.y**2)]
+            [self.w**2 + self.x**2 - self.y**2 - self.z**2, 2 * (self.x * self.y - self.w * self.z),
+             2 * (self.w * self.y + self.x * self.z)],
+            [2 * (self.x * self.y + self.w * self.z),self.w**2 - self.x**2
+             + self.y**2 - self.z**2, 2 * (self.y * self.z - self.w * self.x)],
+            [2 * (self.x * self.z - self.w * self.y), 2 *
+             (self.w * self.x + self.y * self.z), self.w**2 - self.x**2
+             - self.y**2 + self.z**2 ]
         ])
         return R
 
@@ -108,10 +116,18 @@ class Quaternion:
         return R @ v
 
 
-a = np.array([-0.00085769, -0.0404217, 0.29184193, -0.47288709])
-b = np.array([1, 0, 0, 0])
-q = Quaternion(a)
-q2 = Quaternion(b)
+q1 = Quaternion(0.55747131, 0.12956903, 0.5736954 , 0.58592763)
+q2 = Quaternion(0.49753507, 0.50806522, 0.52711628, 0.4652709)
+
+print(q1*q2)
+# expect '(-0.3635 +0.3896i +0.3419j +0.7740k)'
 
 
-v = np.array([0.25557699, 0.74814091, 0.71491841])
+q3 = q1*q2
+
+
+q = Quaternion(1, 0, 1, 0)
+r = [1, 0, 0]
+f = [2 ,3, 4]
+
+l = q.conjugate().rotate_vector(r)
