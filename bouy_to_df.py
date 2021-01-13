@@ -40,16 +40,16 @@ while (i<1024):
 port.close()
 
 
-with open('data/sampleData.csv', 'wb') as f:#obviously cut and paste from the internet
+with open('data/still in water range test.csv', 'wb') as f:#obviously cut and paste from the internet
     for line in lst:
         f.write(line)#write each line into the csv, it dectects , and \n
 
 
 # create a dataframe using the file we just made
-df = pd.read_csv('data/sampleData.csv',index_col=0,error_bad_lines=False)
+#df = pd.read_csv('data/still in water.csv',index_col=0,error_bad_lines=False)
 
 #take a peek into the dataframe
-print(df.head())
+#print(df.head())
 
 
 
@@ -62,6 +62,6 @@ print(df.head())
 
 
 # the best option by far
-df.plot(subplots=True,figsize=(11,17),layout=(3,4))
+#df.plot(subplots=True,figsize=(11,17),layout=(3,4))
 
 
